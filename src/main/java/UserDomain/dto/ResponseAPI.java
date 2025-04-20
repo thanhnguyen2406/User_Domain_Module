@@ -1,5 +1,6 @@
 package UserDomain.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +18,7 @@ public class ResponseAPI<T> {
     int code;
     String message;
     String token;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Ho_Chi_Minh")
     Date expiration;
 
     Integer currentPage;

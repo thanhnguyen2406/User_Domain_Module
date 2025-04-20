@@ -1,0 +1,29 @@
+USE test;
+
+-- password : 123
+-- ADMIN
+INSERT INTO user (email, password, name, role, is_google_account)
+VALUES ('admin@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Admin', 'ADMIN', false);
+
+-- DOCTOR
+INSERT INTO user (email, password, name, role, is_google_account)
+VALUES
+('doctor1@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor One', 'DOCTOR', false),
+('doctor2@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor Two', 'DOCTOR', false),
+('doctor3@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor Three', 'DOCTOR', false),
+('doctor4@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor Four', 'DOCTOR', false),
+('doctor5@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor Five', 'DOCTOR', false);
+
+-- PATIENT
+INSERT INTO user (email, password, name, role, is_google_account)
+VALUES
+('patient1@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient One', 'PATIENT', false),
+('patient2@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Two', 'PATIENT', false),
+('patient3@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Three', 'PATIENT', false),
+('patient4@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Four', 'PATIENT', false),
+('patient5@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Five', 'PATIENT', false),
+('patient6@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Six', 'PATIENT', false),
+('patient7@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Seven', 'PATIENT', false),
+('patient8@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Eight', 'PATIENT', false),
+('patient9@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Nine', 'PATIENT', false),
+('patient10@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Ten', 'PATIENT', false);

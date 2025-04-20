@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +43,7 @@ public class UserService implements IUserService {
             return ResponseAPI.<UserDTO>builder()
                     .code(200)
                     .data(userDTO)
-                    .message("My Info fetched successfully")
+                    .message("My info fetched successfully")
                     .build();
         } catch (AppException e) {
             return ResponseAPI.<UserDTO>builder()
@@ -72,8 +71,6 @@ public class UserService implements IUserService {
             existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             existingUser.setName(userDTO.getName());
             userRepository.save(existingUser);
-
-            UserDTO updatedUserDTO = userMapper.toUserDTO(existingUser);
 
             return ResponseAPI.<Void>builder()
                     .code(200)
@@ -128,6 +125,7 @@ public class UserService implements IUserService {
             }
             User user = userMapper.toUser(userDTO);
             user.setRole("DOCTOR");
+            user.setIsGoogleAccount(false);
             userRepository.save(user);
             return ResponseAPI.<Void>builder()
                     .code(200)
@@ -189,7 +187,7 @@ public class UserService implements IUserService {
             List<UserDTO> userDTOS = users.getContent().stream().map(userMapper::toUserDTO).toList();
             return ResponseAPI.<List<UserDTO>>builder()
                     .code(200)
-                    .message("All Users fetched successfully")
+                    .message("All users fetched successfully")
                     .data(userDTOS)
                     .currentPage(users.getNumber())
                     .totalElements(userDTOS.size())
@@ -218,7 +216,7 @@ public class UserService implements IUserService {
             List<UserDTO> userDTOS = users.getContent().stream().map(userMapper::toUserDTO).toList();
             return ResponseAPI.<List<UserDTO>>builder()
                     .code(200)
-                    .message("All Patients fetched successfully")
+                    .message("All patients fetched successfully")
                     .data(userDTOS)
                     .currentPage(users.getNumber())
                     .totalElements(userDTOS.size())
@@ -247,7 +245,7 @@ public class UserService implements IUserService {
             List<UserDTO> userDTOS = users.getContent().stream().map(userMapper::toUserDTO).toList();
             return ResponseAPI.<List<UserDTO>>builder()
                     .code(200)
-                    .message("All Doctors fetched successfully")
+                    .message("All doctors fetched successfully")
                     .data(userDTOS)
                     .currentPage(users.getNumber())
                     .totalElements(userDTOS.size())

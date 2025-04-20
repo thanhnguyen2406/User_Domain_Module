@@ -32,7 +32,7 @@ public class UserController {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('DOCTOR') or hasRole('PATIENT')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ResponseAPI<Void>> deleteUser(@PathVariable Long id) {
         ResponseAPI<Void> response = userService.deleteUser(id);
