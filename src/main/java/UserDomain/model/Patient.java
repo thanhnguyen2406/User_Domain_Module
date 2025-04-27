@@ -19,16 +19,16 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @OnDelete(action = OnDeleteAction.CASCADE)
 public class Patient extends User{
-    @Column(nullable = false)
+    @Column(nullable = true)
     @JsonFormat(pattern = "dd/MM/yyyy")
     LocalDate birthDate;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     String phoneNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     String address;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     String assurance;
 }
