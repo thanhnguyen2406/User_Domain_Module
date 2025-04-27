@@ -59,7 +59,11 @@
   {
      "email": "user1@gmail.com",
      "password": "123",
-     "name": "Nguyen Cong Thanh"
+     "name": "Nguyen Cong Thanh",
+     "birthDate": "2000-01-01",
+     "phoneNumber": "0123456789",
+     "address": "123 street ABC, District 1, TP.HCM",
+     "assurance": "ABCDEF"
   }
   ```
 - **Response**:
@@ -221,7 +225,10 @@
   {
     "email": "admin2",
     "password": "123",
-    "name": "Admin 2"
+    "name": "Admin 2",
+    "department": "Radiology",
+    "experienceYears": 5,
+    "specialization": "Radiologist"
   }
   ```
 - **Response**:
@@ -230,6 +237,7 @@
       {
           "statusCode": 200,
           "message": "Doctor created successfully"
+      }
       ```
     - `401 User existed`
       ```json

@@ -1,11 +1,15 @@
 package UserDomain.dto.UserDTO;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -24,4 +28,17 @@ public class UserDTO {
     String name;
 
     String role;
+
+    boolean isGoogleAccount;
+    //Doctor
+    String department;
+    @Min(0)
+    int experienceYears;
+    String specialization;
+
+    //Patient
+    LocalDate birthDate;
+    String phoneNumber;
+    String address;
+    String assurance;
 }
