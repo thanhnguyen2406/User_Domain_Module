@@ -59,7 +59,11 @@
   {
      "email": "user1@gmail.com",
      "password": "123",
-     "name": "Nguyen Cong Thanh"
+     "name": "Nguyen Cong Thanh",
+     "birthDate": "2000-01-01",
+     "phoneNumber": "0123456789",
+     "address": "123 street ABC, District 1, TP.HCM",
+     "assurance": "ABCDEF"
   }
   ```
 - **Response**:
@@ -219,9 +223,12 @@
 - **Request Body**:
   ```json
   {
-    "email": "admin2",
+    "email": "doctor1@gmail.com",
     "password": "123",
-    "name": "Admin 2"
+    "name": "Doctor 2",
+    "department": "Radiology",
+    "experienceYears": 5,
+    "specialization": "Radiologist"
   }
   ```
 - **Response**:
@@ -230,6 +237,7 @@
       {
           "statusCode": 200,
           "message": "Doctor created successfully"
+      }
       ```
     - `401 User existed`
       ```json
@@ -252,12 +260,29 @@
 - **Description**: Cho phép user cập nhật thông tin cá nhân.
 - **Authorization**: `ADMIN` or `DOCTOR` or `PATIENT`
 - **Request Body**:
+- `Update patient profile`:
+  ```json
+  {
+    "id": 2, 
+    "email": "patient100@gmail.com",
+    "password": "123",
+    "name": "Patient 100",
+    "birthDate": "2111-11-01",
+    "phoneNumber": "0123456789",
+    "address": "123 street ABC, District 1, TP.HCM",
+    "assurance": "ABCDEF"
+  }   
+  ```
+- `Update doctor profile`:
   ```json
   {
     "id": 2, 
     "email": "doctor100@gmail.com",
     "password": "123",
-    "name": "Doctor 100"
+    "name": "Doctor 100",
+    "department": "Cardiology",
+    "experienceYears": 3,
+    "specialization": "Cardiologist"
   }   
   ```
 - **Response**:

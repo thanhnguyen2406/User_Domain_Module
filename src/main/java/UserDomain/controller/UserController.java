@@ -2,6 +2,7 @@ package UserDomain.controller;
 
 import UserDomain.dto.ResponseAPI;
 import UserDomain.dto.UserDTO.UserDTO;
+import UserDomain.enums.UserType;
 import UserDomain.service.interf.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

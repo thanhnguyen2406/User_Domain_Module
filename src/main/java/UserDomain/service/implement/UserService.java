@@ -2,10 +2,17 @@ package UserDomain.service.implement;
 
 import UserDomain.dto.ResponseAPI;
 import UserDomain.dto.UserDTO.UserDTO;
+import UserDomain.enums.UserType;
 import UserDomain.exception.AppException;
 import UserDomain.exception.ErrorCode;
+import UserDomain.factory.UserFactory;
+import UserDomain.factory.UserFactoryProvider;
 import UserDomain.mapper.UserMapper;
+import UserDomain.model.Doctor;
+import UserDomain.model.Patient;
 import UserDomain.model.User;
+import UserDomain.repository.DoctorRepository;
+import UserDomain.repository.PatientRepository;
 import UserDomain.repository.UserRepository;
 import UserDomain.service.interf.IUserService;
 import lombok.AccessLevel;
@@ -25,8 +32,58 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserService implements IUserService {
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    UserRepository userRepository;
+    PatientRepository patientRepository;
+    DoctorRepository doctorRepository;
+    UserMapper userMapper;
+    UserFactoryProvider factoryProvider;
+
+    @Override
+    public User createUserFactory(UserDTO userDTO) {
+        UserType userType = userDTO.getUserType();
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+        String sanitizedUsername = userDTO.getEmail().trim();
+        if (!sanitizedUsername.endsWith("@gmail.com")) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED_USERNAME_DOMAIN);
+        }
+        UserFactory factory = factoryProvider.getFactory(userType);
+        if (factory == null) {
+            throw new IllegalArgumentException("Unsupported user type: " + userType);
+        }
+        User user = factory.createUser(userDTO);
+        if (userType == UserType.PATIENT) {
+            return patientRepository.save((Patient) user);
+        } else if (userType == UserType.DOCTOR) {
+            return doctorRepository.save((Doctor) user);
+        } else {
+            return userRepository.save(user);
+        }
+    }
+
+    @Override
+    public User updateUserFactory(UserDTO userDTO) {
+        User existingUser = userRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        String sanitizedUsername = userDTO.getEmail().trim();
+        if (!sanitizedUsername.endsWith("@gmail.com")) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED_USERNAME_DOMAIN);
+        }
+        UserType userType = UserType.valueOf(existingUser.getRole());
+        UserFactory factory = factoryProvider.getFactory(userType);
+        if (factory == null) {
+            throw new IllegalArgumentException("Unsupported user type: " + userType);
+        }
+        User user = factory.updateUser(existingUser, userDTO);
+        if (userType == UserType.PATIENT) {
+            return patientRepository.save((Patient) user);
+        } else if (userType == UserType.DOCTOR) {
+            return doctorRepository.save((Doctor) user);
+        } else {
+            return userRepository.save(user);
+        }
+    }
 
     @Override
     public ResponseAPI<UserDTO> getMyInfo() {
@@ -61,17 +118,7 @@ public class UserService implements IUserService {
     @Override
     public ResponseAPI<Void> updateUser(UserDTO userDTO) {
         try {
-            User existingUser = userRepository.findById(userDTO.getId())
-                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
-            if(!existingUser.getEmail().equals(userDTO.getEmail())) {
-                existingUser.setEmail(userDTO.getEmail());
-            }
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(5);
-            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            existingUser.setName(userDTO.getName());
-            userRepository.save(existingUser);
-
+            updateUserFactory(userDTO);
             return ResponseAPI.<Void>builder()
                     .code(200)
                     .message("User updated successfully")
@@ -117,16 +164,8 @@ public class UserService implements IUserService {
     @Override
     public ResponseAPI<Void> createDoctor(UserDTO userDTO) {
         try {
-            if (!userDTO.getEmail().endsWith("@gmail.com")) {
-                throw new AppException(ErrorCode.UNAUTHENTICATED_USERNAME_DOMAIN);
-            }
-            if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-                throw new AppException(ErrorCode.USER_EXISTED);
-            }
-            User user = userMapper.toUser(userDTO);
-            user.setRole("DOCTOR");
-            user.setIsGoogleAccount(false);
-            userRepository.save(user);
+            userDTO.setUserType(UserType.DOCTOR);
+            createUserFactory(userDTO);
             return ResponseAPI.<Void>builder()
                     .code(200)
                     .message("Doctor created successfully")
@@ -140,39 +179,6 @@ public class UserService implements IUserService {
             return ResponseAPI.<Void>builder()
                     .code(500)
                     .message("Error Occurs During Created Doctor: " + e.getMessage())
-                    .build();
-        }
-    }
-
-    @Override
-    public ResponseAPI<Void> createPatient(String email, String name) {
-        try {
-            if (!email.endsWith("@gmail.com")) {
-                throw new AppException(ErrorCode.UNAUTHENTICATED_USERNAME_DOMAIN);
-            }
-            if (userRepository.findByEmail(email).isPresent()) {
-                throw new AppException(ErrorCode.USER_EXISTED);
-            }
-            User user = User.builder()
-                    .email(email)
-                    .name(name)
-                    .role("PATIENT")
-                    .isGoogleAccount(true)
-                    .build();
-            userRepository.save(user);
-            return ResponseAPI.<Void>builder()
-                    .code(200)
-                    .message("Patient register successfully")
-                    .build();
-        } catch (AppException e) {
-            return ResponseAPI.<Void>builder()
-                    .code(e.getErrorCode().getCode())
-                    .message(e.getErrorCode().getMessage())
-                    .build();
-        } catch (Exception e) {
-            return ResponseAPI.<Void>builder()
-                    .code(500)
-                    .message("Error Occurs During Register Patient: " + e.getMessage())
                     .build();
         }
     }

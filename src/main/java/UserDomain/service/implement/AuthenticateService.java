@@ -4,6 +4,7 @@ import UserDomain.dto.AuthenticateDTO.AuthenticateDTO;
 import UserDomain.dto.AuthenticateDTO.IntrospectDTO;
 import UserDomain.dto.ResponseAPI;
 import UserDomain.dto.UserDTO.UserDTO;
+import UserDomain.enums.UserType;
 import UserDomain.exception.AppException;
 import UserDomain.exception.ErrorCode;
 import UserDomain.mapper.UserMapper;
@@ -150,27 +151,15 @@ public class AuthenticateService implements IAuthenticateService {
         }
     }
 
-    private String buildScope(User user){
+    private String buildScope(User user) {
         return "ROLE_" + user.getRole();
     }
 
     @Override
     public ResponseAPI<Void> registerUser(UserDTO request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new AppException(ErrorCode.USER_EXISTED);
-        }
-        String sanitizedUsername = request.getEmail().trim();
-        if (!sanitizedUsername.endsWith("@gmail.com")) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED_USERNAME_DOMAIN);
-        }
-
-        User user = userMapper.toUser(request);
-        user.setRole("PATIENT");
-        user.setIsGoogleAccount(false);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(5);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-
+        request.setGoogleAccount(false);
+        request.setUserType(UserType.PATIENT);
+        userService.createUserFactory(request);
         return ResponseAPI.<Void>builder()
                 .code(200)
                 .message("Patient register successfully")
@@ -261,7 +250,29 @@ public class AuthenticateService implements IAuthenticateService {
             authenticateDTO.setEmail(email);
             return authenticate(authenticateDTO, true);
         } else if (state.equals("register")) {
-            return userService.createPatient(email, name);
+            UserDTO userDTO = UserDTO.builder()
+                    .email(email)
+                    .name(name)
+                    .isGoogleAccount(true)
+                    .userType(UserType.PATIENT)
+                    .build();
+            try {
+                userService.createUserFactory(userDTO);
+                return ResponseAPI.<Void>builder()
+                        .code(200)
+                        .message("Patient register successfully")
+                        .build();
+            } catch (AppException e) {
+                return ResponseAPI.<Void>builder()
+                        .code(e.getErrorCode().getCode())
+                        .message(e.getErrorCode().getMessage())
+                        .build();
+            } catch (Exception e) {
+                return ResponseAPI.<Void>builder()
+                        .code(500)
+                        .message("Error when register patient with google: " + e.getMessage())
+                        .build();
+            }
         } else {
             return ResponseAPI.<Void>builder()
                     .code(200)
