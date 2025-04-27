@@ -158,7 +158,8 @@ public class AuthenticateService implements IAuthenticateService {
     @Override
     public ResponseAPI<Void> registerUser(UserDTO request) {
         request.setGoogleAccount(false);
-        userService.createUser(UserType.PATIENT, request);
+        request.setUserType(UserType.PATIENT);
+        userService.createUserFactory(request);
         return ResponseAPI.<Void>builder()
                 .code(200)
                 .message("Patient register successfully")
@@ -253,9 +254,10 @@ public class AuthenticateService implements IAuthenticateService {
                     .email(email)
                     .name(name)
                     .isGoogleAccount(true)
+                    .userType(UserType.PATIENT)
                     .build();
             try {
-                userService.createUser(UserType.PATIENT, userDTO);
+                userService.createUserFactory(userDTO);
                 return ResponseAPI.<Void>builder()
                         .code(200)
                         .message("Patient register successfully")

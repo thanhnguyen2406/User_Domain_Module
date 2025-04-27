@@ -1,5 +1,6 @@
 package UserDomain.dto.UserDTO;
 
+import UserDomain.enums.UserType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
@@ -17,19 +18,12 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
     long id;
-
-    @NotBlank(message = "Username can not be empty")
     String email;
-
-    @NotBlank(message = "Password can not be empty")
     String password;
-
-    @NotBlank(message = "Name can not be empty")
     String name;
-
     String role;
-
     boolean isGoogleAccount;
+
     //Doctor
     String department;
     @Min(0)
@@ -41,4 +35,6 @@ public class UserDTO {
     String phoneNumber;
     String address;
     String assurance;
+
+    UserType userType;
 }

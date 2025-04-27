@@ -5,4 +5,5 @@ import UserDomain.model.User;
 
 public interface UserFactory {
     User createUser(UserDTO userDTO);
+    User updateUser(User user, UserDTO userDTO);
 }

@@ -9,10 +9,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PatientFactory implements UserFactory {
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(5);
     @Override
     public User createUser(UserDTO userDTO) {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(5);
-
         return Patient.builder()
                 .email(userDTO.getEmail())
                 .password(userDTO.isGoogleAccount()? null : passwordEncoder.encode(userDTO.getPassword()))
@@ -24,5 +23,22 @@ public class PatientFactory implements UserFactory {
                 .address(userDTO.getAddress())
                 .assurance(userDTO.getAssurance())
                 .build();
+    }
+
+    @Override
+    public User updateUser(User user, UserDTO userDTO) {
+        Patient patient = (Patient) user;
+        patient.setName(userDTO.getName());
+        patient.setBirthDate(userDTO.getBirthDate());
+        patient.setPhoneNumber(userDTO.getPhoneNumber());
+        patient.setAddress(userDTO.getAddress());
+        patient.setAssurance(userDTO.getAssurance());
+        if (!user.getIsGoogleAccount()) {
+            patient.setEmail(userDTO.getEmail());
+            if (userDTO.getPassword() != null) {
+                patient.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            }
+        }
+        return patient;
     }
 }
