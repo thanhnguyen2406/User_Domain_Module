@@ -28,7 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.util.UriUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -64,6 +67,9 @@ public class AuthenticateService implements IAuthenticateService {
 
     @Value("${spring.security.oauth2.client.provider.google.user-info-uri}")
     private String userInfoUri;
+
+    @Value("${REDIRECT_FE_URL}")
+    private String redirectFEUrl;
 
     @Override
     public ResponseAPI<Void> authenticate(AuthenticateDTO request, Boolean isGoogleLogin) {
@@ -192,7 +198,7 @@ public class AuthenticateService implements IAuthenticateService {
     }
 
     @Override
-    public ResponseAPI<Void> getAccessToken(String code, String state) {
+    public RedirectView getAccessToken(String code, String state) {
         RestTemplate restTemplate = new RestTemplate();
         String tokenUrl = tokenUri;
 
@@ -220,64 +226,52 @@ public class AuthenticateService implements IAuthenticateService {
         return getUserInfo(accessToken, state);
     }
 
-    public ResponseAPI<Void> getUserInfo(String accessToken, String state) {
-        System.out.println(state);
-        RestTemplate restTemplate = new RestTemplate();
+    public RedirectView getUserInfo(String accessToken, String state) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + accessToken);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
 
-        HttpEntity<Void> userRequest = new HttpEntity<>(headers);
+            HttpEntity<Void> userRequest = new HttpEntity<>(headers);
 
-        ResponseEntity<Map> userResponse = restTemplate.exchange(
-                userInfoUri,
-                HttpMethod.GET,
-                userRequest,
-                Map.class
-        );
+            ResponseEntity<Map> userResponse = restTemplate.exchange(
+                    userInfoUri,
+                    HttpMethod.GET,
+                    userRequest,
+                    Map.class
+            );
 
-        Map userInfo = userResponse.getBody();
+            Map userInfo = userResponse.getBody();
 
-        if (!userResponse.getStatusCode().is2xxSuccessful() || userInfo == null) {
-            throw new AppException(ErrorCode.USERINFO_FETCHED_FAIL);
-        }
-
-        String email = userInfo.get("email") != null ? userInfo.get("email").toString() : "Unknown";
-        String name = userInfo.get("name") != null ? userInfo.get("name").toString() : "Unknown";
-
-        if (state.equals("login")) {
-            AuthenticateDTO authenticateDTO = new AuthenticateDTO();
-            authenticateDTO.setEmail(email);
-            return authenticate(authenticateDTO, true);
-        } else if (state.equals("register")) {
-            UserDTO userDTO = UserDTO.builder()
-                    .email(email)
-                    .name(name)
-                    .isGoogleAccount(true)
-                    .userType(UserType.PATIENT)
-                    .build();
-            try {
-                userService.createUserFactory(userDTO);
-                return ResponseAPI.<Void>builder()
-                        .code(200)
-                        .message("Patient register successfully")
-                        .build();
-            } catch (AppException e) {
-                return ResponseAPI.<Void>builder()
-                        .code(e.getErrorCode().getCode())
-                        .message(e.getErrorCode().getMessage())
-                        .build();
-            } catch (Exception e) {
-                return ResponseAPI.<Void>builder()
-                        .code(500)
-                        .message("Error when register patient with google: " + e.getMessage())
-                        .build();
+            if (!userResponse.getStatusCode().is2xxSuccessful() || userInfo == null) {
+                throw new AppException(ErrorCode.USERINFO_FETCHED_FAIL);
             }
-        } else {
-            return ResponseAPI.<Void>builder()
-                    .code(200)
-                    .message("User info fetched successfully")
-                    .build();
+
+            String email = userInfo.get("email") != null ? userInfo.get("email").toString() : "Unknown";
+            String name = userInfo.get("name") != null ? userInfo.get("name").toString() : "Unknown";
+
+            if (state.equals("login")) {
+                AuthenticateDTO authenticateDTO = new AuthenticateDTO();
+                authenticateDTO.setEmail(email);
+                authenticate(authenticateDTO, true);
+                return new RedirectView(redirectFEUrl);
+            } else {
+                UserDTO userDTO = UserDTO.builder()
+                        .email(email)
+                        .name(name)
+                        .isGoogleAccount(true)
+                        .userType(UserType.PATIENT)
+                        .build();
+                userService.createUserFactory(userDTO);
+                return new RedirectView(redirectFEUrl + "/profile");
+            }
+        } catch (AppException e) {
+            String message = "Error: " + e.getErrorCode().name();
+            return new RedirectView(redirectFEUrl + "/error?message=" + UriUtils.encode(message, StandardCharsets.UTF_8));
+
+        } catch (Exception e) {
+            return new RedirectView(redirectFEUrl + "/error?message=" + UriUtils.encode(e.getMessage(), StandardCharsets.UTF_8));
         }
     }
 }

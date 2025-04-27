@@ -6,6 +6,7 @@ import UserDomain.dto.ResponseAPI;
 import UserDomain.dto.UserDTO.UserDTO;
 import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.text.ParseException;
 
@@ -13,6 +14,6 @@ public interface IAuthenticateService {
     ResponseAPI<Void> authenticate(AuthenticateDTO request, Boolean isGoogleLogin);
     ResponseAPI<Void> introspect(IntrospectDTO request) throws ParseException, JOSEException;
     ResponseAPI<String> generateAuthUrl(HttpServletRequest request, String login);
-    ResponseAPI<Void> getAccessToken(String code, String state);
+    RedirectView getAccessToken(String code, String state);
     ResponseAPI<Void> registerUser(UserDTO request);
 }

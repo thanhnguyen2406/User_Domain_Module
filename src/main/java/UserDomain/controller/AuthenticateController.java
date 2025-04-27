@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.text.ParseException;
 
@@ -38,12 +39,10 @@ public class AuthenticateController {
     }
 
     @GetMapping("/callback-google")
-    public ResponseEntity<ResponseAPI<Void>> googleCallback(
+    public RedirectView googleCallback(
             @RequestParam String code,
-            @RequestParam String state,
-            HttpServletRequest request) {
-        ResponseAPI<Void> response = authenticateService.getAccessToken(code, state);
-        return ResponseEntity.status(response.getCode()).body(response);
+            @RequestParam String state) {
+        return authenticateService.getAccessToken(code, state);
     }
 
     @PostMapping("/register")
