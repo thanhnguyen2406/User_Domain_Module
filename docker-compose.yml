@@ -7,31 +7,15 @@ services:
     image: user-domain:v1.0
     container_name: userDomain
     ports:
-      - "8080:8080"
+      - "8081:8080"
     env_file:
       - .env
-    depends_on:
-      - mysql
     networks:
-      - app-network
-
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MY_SQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: userDomain
-      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
-      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - app-network
+      - microservice-net
 
 networks:
-  app-network:
+  microservice-net:
+    external: true
 
 volumes:
   mysql_data:

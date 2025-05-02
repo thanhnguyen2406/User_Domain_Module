@@ -44,7 +44,7 @@ public class SecurityConfiguration {
         );
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
-        httpSecurity.cors(Customizer.withDefaults());
+        httpSecurity.cors(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
 

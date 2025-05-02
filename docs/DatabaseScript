@@ -6,17 +6,23 @@ INSERT INTO user (email, password, name, role, is_google_account)
 VALUES ('admin@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Admin', 'ADMIN', false);
 
 -- DOCTOR
-INSERT INTO user (email, password, name, role, is_google_account)
-VALUES
+INSERT INTO user (email, password, name, role, is_google_account) VALUES
 ('doctor1@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor One', 'DOCTOR', false),
 ('doctor2@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor Two', 'DOCTOR', false),
 ('doctor3@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor Three', 'DOCTOR', false),
 ('doctor4@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor Four', 'DOCTOR', false),
 ('doctor5@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Doctor Five', 'DOCTOR', false);
 
+INSERT INTO doctor (id, department, experience_years, specialization) VALUES
+((SELECT id FROM user WHERE email = 'doctor1@gmail.com'), 'Cardiology', 10, 'Heart Diseases'),
+((SELECT id FROM user WHERE email = 'doctor2@gmail.com'), 'Neurology', 8, 'Brain Surgery'),
+((SELECT id FROM user WHERE email = 'doctor3@gmail.com'), 'Oncology', 12, 'Cancer Treatment'),
+((SELECT id FROM user WHERE email = 'doctor4@gmail.com'), 'Orthopedics', 7, 'Bone & Joint'),
+((SELECT id FROM user WHERE email = 'doctor5@gmail.com'), 'Pediatrics', 5, 'Children Healthcare');
+
+
 -- PATIENT
-INSERT INTO user (email, password, name, role, is_google_account)
-VALUES
+INSERT INTO user (email, password, name, role, is_google_account) VALUES
 ('patient1@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient One', 'PATIENT', false),
 ('patient2@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Two', 'PATIENT', false),
 ('patient3@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Three', 'PATIENT', false),
@@ -27,3 +33,15 @@ VALUES
 ('patient8@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Eight', 'PATIENT', false),
 ('patient9@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Nine', 'PATIENT', false),
 ('patient10@gmail.com', '$2a$05$jXAuLuNQwlszySaNhOTJd.bbbwl8Zj61stkwdkeV48XcsQh8PYtZK', 'Patient Ten', 'PATIENT', false);
+
+INSERT INTO patient (id, birth_date, phone_number, address, assurance) VALUES
+((SELECT id FROM user WHERE email = 'patient1@gmail.com'), '1990-01-01', '0909123456', '123 Street A', 'Insurance A'),
+((SELECT id FROM user WHERE email = 'patient2@gmail.com'), '1985-02-01', '0909123457', '456 Street B', 'Insurance B'),
+((SELECT id FROM user WHERE email = 'patient3@gmail.com'), '1992-03-01', '0909123458', '789 Street C', 'Insurance C'),
+((SELECT id FROM user WHERE email = 'patient4@gmail.com'), '1993-04-01', '0909123459', '321 Street D', 'Insurance D'),
+((SELECT id FROM user WHERE email = 'patient5@gmail.com'), '1994-05-01', '0909123460', '654 Street E', 'Insurance E'),
+((SELECT id FROM user WHERE email = 'patient6@gmail.com'), '1995-06-01', '0909123461', '987 Street F', 'Insurance F'),
+((SELECT id FROM user WHERE email = 'patient7@gmail.com'), '1996-07-01', '0909123462', '147 Street G', 'Insurance G'),
+((SELECT id FROM user WHERE email = 'patient8@gmail.com'), '1997-08-01', '0909123463', '258 Street H', 'Insurance H'),
+((SELECT id FROM user WHERE email = 'patient9@gmail.com'), '1998-09-01', '0909123464', '369 Street I', 'Insurance I'),
+((SELECT id FROM user WHERE email = 'patient10@gmail.com'), '1999-10-01', '0909123465', '741 Street J', 'Insurance J');
