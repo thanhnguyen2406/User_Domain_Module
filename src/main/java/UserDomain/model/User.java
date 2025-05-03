@@ -30,5 +30,6 @@ public class User {
     String role;
 
     @Column(nullable = false)
+    @Builder.Default
     Boolean isGoogleAccount = false;
 }

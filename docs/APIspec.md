@@ -196,25 +196,62 @@
 - **Description**: Cho phép người dùng xem thông tin cá nhân của mình.
 - **Authorization**: `ADMIN` or `DOCTOR` or `PATIENT`
 - **Response**:
-    - `200 OK`:
+    - `200 OK` Admin:
       ```json
       {
           "statusCode": 200,
           "message": "My info fetch successfully",
           "data": {
-            "id": 0,
-            "email": "user1@gmail.com",
-            "name": "NCT"
+            "id": 1,
+            "email": "admin@gmail.com",
+            "name": "Admin",
+            "role": "ADMIN",
+            "googleAccount": false
           }
       }
       ```
-    - `404 User not found`
+    - `200 OK` Doctor:
       ```json
       {
-         "code": 404,
-         "message": "User not found"     
+          "statusCode": 200,
+          "message": "My info fetch successfully",
+          "data": {
+            "id": 2,
+            "email": "doctor1@gmail.com",
+            "name": "Doctor One",
+            "role": "DOCTOR",
+            "department": "Cardiology",
+            "experienceYears": 10,
+            "specialization": "Heart Diseases",
+            "googleAccount": false
+          }
       }
       ```
+    - `200 OK` Patient:
+      ```json
+      {
+          "statusCode": 200,
+          "message": "My info fetch successfully",
+          "data": {
+            "id": 7,
+            "email": "patient1@gmail.com",
+            "name": "Patient One",
+            "role": "PATIENT",
+            "birthDate": "1990-01-01",
+            "phoneNumber": "0909123456",
+            "address": "123 Street A",
+            "assurance": "Insurance A",
+            "googleAccount": false
+          }
+      }
+      ```
+      - `404 User not found`
+        ```json
+        {
+           "code": 404,
+           "message": "User not found"     
+        }
+        ```
 
 #### 2. Create Doctor
 - **URL**:  `POST /users/create-doctor`
@@ -322,7 +359,70 @@
       }
       ```
 
-#### 5. Get All Users
+#### 5. Get User By Id
+- **URL**:  `GET users/{id}`
+- **Description**: Cho phép admin lấy nguười dùng dựa vào id.
+- **Authorization**: `ADMIN`
+- **Path Variable**: long id
+- **Response**:
+    - `200 OK` Admin:
+      ```json
+      {
+          "statusCode": 200,
+          "message": "Fetched user successfully",
+          "data": {
+            "id": 1,
+            "email": "admin@gmail.com",
+            "name": "Admin",
+            "role": "ADMIN",
+            "googleAccount": false
+          }
+      }
+      ```
+    - `200 OK` Doctor:
+      ```json
+      {
+          "statusCode": 200,
+          "message": "Fetched user successfully",
+          "data": {
+            "id": 2,
+            "email": "doctor1@gmail.com",
+            "name": "Doctor One",
+            "role": "DOCTOR",
+            "department": "Cardiology",
+            "experienceYears": 10,
+            "specialization": "Heart Diseases",
+            "googleAccount": false
+          }
+      }
+      ```
+    - `200 OK` Patient:
+      ```json
+      {
+          "statusCode": 200,
+          "message": "Fetched user successfully",
+          "data": {
+            "id": 7,
+            "email": "patient1@gmail.com",
+            "name": "Patient One",
+            "role": "PATIENT",
+            "birthDate": "1990-01-01",
+            "phoneNumber": "0909123456",
+            "address": "123 Street A",
+            "assurance": "Insurance A",
+            "googleAccount": false
+          }
+      }
+      ```
+    - `404 User not found`
+      ```json
+      {
+         "code": 404,
+         "message": "User not found"     
+      }
+      ```
+
+#### 6. Get All Users
 - **URL**: `GET /users/all-users`
 - **Description**: Lấy ra toàn bộ user.
 - - **Authorization**: `ADMIN`
@@ -381,7 +481,7 @@
       }
       ```
 
-#### 5. Get All Doctors
+#### 7. Get All Doctors
 - **URL**: `GET /users/all-doctors`
 - **Description**: Lấy ra toàn bộ doctor.
 - - **Authorization**: `ADMIN`
@@ -440,7 +540,7 @@
       }
       ```
 
-#### 7. Get All Patients
+#### 8. Get All Patients
 - **URL**: `GET /users/all-patients`
 - **Description**: Lấy ra toàn bộ patient.
 - - **Authorization**: `ADMIN`

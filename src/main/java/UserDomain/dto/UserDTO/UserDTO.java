@@ -26,8 +26,7 @@ public class UserDTO {
 
     //Doctor
     String department;
-    @Min(0)
-    int experienceYears;
+    Integer experienceYears;
     String specialization;
 
     //Patient

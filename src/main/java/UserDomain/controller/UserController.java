@@ -2,7 +2,6 @@ package UserDomain.controller;
 
 import UserDomain.dto.ResponseAPI;
 import UserDomain.dto.UserDTO.UserDTO;
-import UserDomain.enums.UserType;
 import UserDomain.service.interf.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +47,13 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseAPI<UserDTO>> getUserById(@PathVariable Long id) {
+        ResponseAPI<UserDTO> response = userService.getUserById(id);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all-users")
     public ResponseEntity<ResponseAPI<List<UserDTO>>> getAllUsers(
             @RequestParam (defaultValue = "0") int page,
@@ -77,6 +83,13 @@ public class UserController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         ResponseAPI<List<UserDTO>> response = userService.getAllDoctors(pageable);
+        return ResponseEntity.status(response.getCode()).body(response);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}/status")
+    public ResponseEntity<ResponseAPI<List<UserDTO>>> changDoctorAvailability(@PathVariable Long id) {
+        ResponseAPI<List<UserDTO>> response = userService.changDoctorAvailability(id);
         return ResponseEntity.status(response.getCode()).body(response);
     }
 }

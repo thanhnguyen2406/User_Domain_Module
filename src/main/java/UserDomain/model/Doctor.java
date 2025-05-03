@@ -22,8 +22,12 @@ public class Doctor extends User{
 
     @Column(nullable = false)
     @Min(0)
-    int experienceYears;
+    Integer experienceYears;
 
     @Column(nullable = false)
     String specialization;
+
+    @Builder.Default
+    @Column(nullable = false)
+    boolean available = false;
 }

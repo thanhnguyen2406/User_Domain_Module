@@ -21,8 +21,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,7 +37,7 @@ public class UserService implements IUserService {
     UserFactoryProvider factoryProvider;
 
     @Override
-    public User createUserFactory(UserDTO userDTO) {
+    public void createUserFactory(UserDTO userDTO) {
         UserType userType = userDTO.getUserType();
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             throw new AppException(ErrorCode.USER_EXISTED);
@@ -54,16 +52,16 @@ public class UserService implements IUserService {
         }
         User user = factory.createUser(userDTO);
         if (userType == UserType.PATIENT) {
-            return patientRepository.save((Patient) user);
+            patientRepository.save((Patient) user);
         } else if (userType == UserType.DOCTOR) {
-            return doctorRepository.save((Doctor) user);
+            doctorRepository.save((Doctor) user);
         } else {
-            return userRepository.save(user);
+            userRepository.save(user);
         }
     }
 
     @Override
-    public User updateUserFactory(UserDTO userDTO) {
+    public void updateUserFactory(UserDTO userDTO) {
         User existingUser = userRepository.findById(userDTO.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         String sanitizedUsername = userDTO.getEmail().trim();
@@ -77,12 +75,27 @@ public class UserService implements IUserService {
         }
         User user = factory.updateUser(existingUser, userDTO);
         if (userType == UserType.PATIENT) {
-            return patientRepository.save((Patient) user);
+            patientRepository.save((Patient) user);
         } else if (userType == UserType.DOCTOR) {
-            return doctorRepository.save((Doctor) user);
+            doctorRepository.save((Doctor) user);
         } else {
-            return userRepository.save(user);
+            userRepository.save(user);
         }
+    }
+
+    @Override
+    public User getUserByIdFactory(long id) {
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        UserType userType = UserType.valueOf(existingUser.getRole());
+
+        return switch (userType) {
+            case DOCTOR -> doctorRepository.findById(id)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+            case PATIENT -> patientRepository.findById(id)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+            default -> existingUser;
+        };
     }
 
     @Override
@@ -93,11 +106,7 @@ public class UserService implements IUserService {
             if (user.isEmpty()) {
                 throw new AppException(ErrorCode.USER_NOT_FOUND);
             }
-            UserDTO userDTO = UserDTO.builder()
-                    .id(user.get().getId())
-                    .email(user.get().getEmail())
-                    .name(user.get().getName())
-                    .build();
+            UserDTO userDTO = userMapper.toUserDTO(user.get());
             return ResponseAPI.<UserDTO>builder()
                     .code(200)
                     .data(userDTO)
@@ -185,6 +194,28 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public ResponseAPI<UserDTO> getUserById(Long id) {
+        try {
+            UserDTO dto = userMapper.toUserDTO(getUserByIdFactory(id));
+            return ResponseAPI.<UserDTO>builder()
+                    .code(200)
+                    .message("Fetched user successfully")
+                    .data(dto)
+                    .build();
+        } catch (AppException e) {
+            return ResponseAPI.<UserDTO>builder()
+                    .code(e.getErrorCode().getCode())
+                    .message(e.getErrorCode().getMessage())
+                    .build();
+        } catch (Exception e) {
+            return ResponseAPI.<UserDTO>builder()
+                    .code(500)
+                    .message("Error Occurs During Fetching User: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @Override
     public ResponseAPI<List<UserDTO>> getAllUsers(Pageable pageable) {
         try {
             Page<User> users = userRepository.findAll(pageable);
@@ -267,6 +298,29 @@ public class UserService implements IUserService {
             return ResponseAPI.<List<UserDTO>>builder()
                     .code(500)
                     .message("Error Occurs During Fetch All Doctors: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @Override
+    public ResponseAPI<List<UserDTO>> changDoctorAvailability(Long id) {
+        try {
+            Doctor doctor = doctorRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+            doctor.setAvailable(!doctor.isAvailable());
+            doctorRepository.save(doctor);
+            return ResponseAPI.<List<UserDTO>>builder()
+                    .code(200)
+                    .message("Setting doctor availability to " + doctor.isAvailable())
+                    .build();
+        } catch (AppException e) {
+            return ResponseAPI.<List<UserDTO>>builder()
+                    .code(e.getErrorCode().getCode())
+                    .message(e.getErrorCode().getMessage())
+                    .build();
+        } catch (Exception e) {
+            return ResponseAPI.<List<UserDTO>>builder()
+                    .code(500)
+                    .message("Error Occurs During Setting Doctor Availability: " + e.getMessage())
                     .build();
         }
     }
