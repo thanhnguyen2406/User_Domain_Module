@@ -94,6 +94,7 @@ public class UserService implements IUserService {
                 throw new AppException(ErrorCode.USER_NOT_FOUND);
             }
             UserDTO userDTO = UserDTO.builder()
+                    .id(user.get().getId())
                     .email(user.get().getEmail())
                     .name(user.get().getName())
                     .build();
